@@ -77,6 +77,7 @@ def GetCommand(name, database):
     then the string describes the error.
   """
   if name in database.Keys():
+    #since this is getting value in the server database, we want to specify that we do not care about the age of the value in the database, we pass None as a parameter.
     return database.GetValue(name, None)
   return "The key is not in the database."
   ##########################################
@@ -95,6 +96,7 @@ def DumpCommand(database):
     A human readable string describing the result. If there is an error,
     then the string describes the error.
   """
+  #initialize an empty list and append all the keys in the list, then, join it so as to return it as CSV
   ans = []
   for key in database.Keys():
     ans.append(key)

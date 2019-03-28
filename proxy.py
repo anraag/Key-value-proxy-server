@@ -42,6 +42,7 @@ def ForwardCommandToServer(command, server_addr, server_port):
   """
 
   # Execute the command based on the first word in the command line.
+  #open a socket to connect to the server and send the command to it, then, close the client socket.
   client_sock = library.CreateClientSocket(server_addr, server_port)
   client_sock.sendall(command)
   data = client_sock.recv(1024)
@@ -101,25 +102,35 @@ def ProxyClientCommand(sock, server_addr, server_port, cache):
   # Update the cache for PUT commands but also pass the traffic to the server.
   if cmd == "PUT" or cmd == "DUMP":
     if cmd == "PUT":
+      #if the given key is already in proxy server cache but the value is updated in the server database, 
+      # we want to have the value corresponding to the key updated in the proxy server cache too.
       if name in cache.Keys():
         cache.StoreValue(name, text + "\n", 1)
+    #pass the traffic to the server
     return ForwardCommandToServer(command_line, server_addr, server_port)
     
 
   ##########################
   #TODO: Implement section
   ##########################
+
   elif cmd == "GET":
     if name in cache.Keys():
+      # check if the given key has not crossed maximum cache age
       if cache.GetValue(name, MAX_CACHE_AGE_SEC) != None:
         data = cache.GetValue(name, MAX_CACHE_AGE_SEC)
+        #since we used GET on a key that is already in the proxy server cache, 
+        # its "time accessed" should be changed to the current time.
         cache.StoreValue(name, data, 1)
         return data
       else:
         data = ForwardCommandToServer(command_line, server_addr, server_port)
+        #if the given key is not in proxy server cache  but is past the maximum cache age, 
+        # we update the proxy cache to change the time accessed to the current time.
         cache.StoreValue(name, data, 1)
         return data
     else:
+      #if the key is not in the proxy cache, we retrieve the value from the server
       data = ForwardCommandToServer(command_line, server_addr, server_port)
       cache.StoreValue(name, data, 1)
       return data
@@ -133,6 +144,7 @@ def ProxyClientCommand(sock, server_addr, server_port, cache):
 
 def main():
   # Listen on a specified port...
+  #wait for a keyboard interrupt to end the while loop and close the server socket
   try:
     server_sock = library.CreateServerSocket(LISTENING_PORT)
     cache = library.KeyValueStore()

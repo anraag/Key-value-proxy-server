@@ -35,9 +35,8 @@ def CreateServerSocket(port):
   Returns:
     An socket that implements TCP/IP.
   """
-  #host = '127.0.0.1'
+  #create a server socket with TCP/IP
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  #s.bind((host, port))
   s.bind(('localhost', port))
   return s
     
@@ -48,6 +47,7 @@ def CreateServerSocket(port):
 def ConnectClientToServer(server_sock):
     # Wait until a client connects and then get a socket that connects to the
     # client.
+    #the server listens until a client wants to connect.
     server_sock.listen(10)
     return server_sock.accept()
     #############################################
@@ -73,6 +73,7 @@ def ReadCommand(sock):
     #############################################
     #TODO: Implement ReadCommand Function
     #############################################
+  #reads the command that we receive via socket
   data = sock.recv(1024)
   return data
 
@@ -113,6 +114,7 @@ class KeyValueStore(object):
   """
 
   def __init__(self):
+    #initialize an empty dictionary
     self.store = {}
     ###########################################
     #TODO: Implement __init__ Function
@@ -131,6 +133,10 @@ class KeyValueStore(object):
     Returns:
       None or the value.
     """
+    #check if we want to get the value from the proxy cache or the server database. Since we need to check the age of the entry if we are retrieving value from the proxy cache,
+    #we have a tuple stored as the value of the cache. The tuple contains (value, time in seconds). If we are retrieving value from the server database, we have only the value stored,
+    #since we do not need to know about the time, while retrieving from the server database.
+
     if max_age_in_sec != None:
       if key in self.store and time.time() - self.store[key][1] <= max_age_in_sec:
         return self.store[key][0]
@@ -153,6 +159,7 @@ class KeyValueStore(object):
       key: string. The name of the value to store.
       value: string. A value to store.
     """
+    #if we are storing in the proxy server cache, we need to store the time that the value was stored. 
     if clock:
       self.store[key] = (value, time.time())
     else:
