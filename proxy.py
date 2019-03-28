@@ -100,6 +100,9 @@ def ProxyClientCommand(sock, server_addr, server_port, cache):
 
   # Update the cache for PUT commands but also pass the traffic to the server.
   if cmd == "PUT" or cmd == "DUMP":
+    if cmd == "PUT":
+      if name in cache.Keys():
+        cache.StoreValue(name, text + "\n", 1)
     return ForwardCommandToServer(command_line, server_addr, server_port)
     
 
