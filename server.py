@@ -136,7 +136,6 @@ def main():
       elif command == 'GET':
         result = GetCommand(name, database)
       elif command == 'DUMP':
-        print("Here")
         result = DumpCommand(database)
       else:
         result = 'Unknown command '  + command

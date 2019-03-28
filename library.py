@@ -133,10 +133,10 @@ class KeyValueStore(object):
     """
     if max_age_in_sec != None:
       if key in self.store and time.time() - self.store[key][1] <= max_age_in_sec:
-        return self.store[key][0] + "\n"
+        return self.store[key][0]
     else:
       if key in self.store:
-        return self.store[key] + "\n"
+        return self.store[key]
     return None
     # Check if we've ever put something in the cache.
 
